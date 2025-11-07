@@ -1,0 +1,55 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  APP_NAME: ${{ vars.APP_NAME }} # webgoat o juiceshop
+  DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_REPO }}
+  DOCKER_IMAGE: ${{ secrets.DOCKERHUB_REPO }}:${{ github.sha }}
+  INFRA_MANIFESTS_REPO: ${{ vars.INFRA_REPO }}
+  DEFECTDOJO_API: ${{ secrets.DEFECTDOJO_API_URL }}
+  DEFECTDOJO_TOKEN: ${{ secrets.DEFECTDOJO_API_TOKEN }}
+
+jobs:
+  ci:
+    runs-on: [self-hosted, linux, x64]
+
+    steps:
+    # 1. Checkout del repositorio de la app
+    - name: Checkout application repo
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    # 2. Preflight (Secret scanning, SAST, SCA)
+    - name: Run Preflight scans
+      run: |
+        mkdir -p reports
+        bash preflight/run_gitleaks.sh
+        bash preflight/run_semgrep.sh
+        bash preflight/run_dependency_check.sh
+
+    # 3. Docker Build
+    - name: Build and tag Docker image
+      run: bash docker/build.sh
+
+    # 4. Image Scanning (Trivy)
+    - name: Scan Docker image
+      run: bash docker/scan_image.sh
+
+    # 5. Push Docker image
+    - name: Push Docker image
+      run: bash docker/push.sh
+
+    # 6. Deploy (update manifests repo)
+    - name: Update infra manifests
+      run: bash deploy/update_manifests.sh
+
+    # 7. Push reports to DefectDojo
+    - name: Upload reports to DefectDojo
+      if: always()
+      run: bash defectdojo/upload_reports.sh
