@@ -16,7 +16,7 @@ env:
 
 jobs:
   ci:
-    runs-on: [self-hosted, linux, x64]
+    runs-on: [self-hosted, linux, x64, webgoat]
 
     steps:
     # 1. Checkout del repositorio de la app
@@ -53,5 +53,6 @@ jobs:
     - name: Upload reports to DefectDojo
       if: always()
       run: bash defectdojo/upload_reports.sh
+
 
 
