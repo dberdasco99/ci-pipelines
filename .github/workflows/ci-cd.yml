@@ -16,7 +16,7 @@ env:
 
 jobs:
   ci:
-    runs-on: [self-hosted, linux, x64, webgoat]
+    runs-on: [self-hosted, linux, x64, shared]
 
     steps:
     # 1. Checkout del repositorio de la app
