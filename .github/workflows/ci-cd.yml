@@ -79,13 +79,18 @@ jobs:
 
 
     # 6. Deploy (update manifests repo)
-    - name: Update infra manifests
+    - name: Update deployment manifests
+      env:
+        DOCKER_IMAGE: dani359/webgoat:${{ github.sha }}
+        GITHUB_TOKEN_MANIFESTS: ${{ secrets.MANIFESTS_REPO_TOKEN }}
+        APP_NAME: webgoat
       run: bash deploy/update_manifests.sh
-
+      
     # 7. Push reports to DefectDojo
     - name: Upload reports to DefectDojo
       if: always()
       run: bash defectdojo/upload_reports.sh
+
 
 
 
