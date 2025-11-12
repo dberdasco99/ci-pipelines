@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 echo "Building application..."
+pwd
+ls -l
+
+
 mvn -B -DskipTests clean package
 
 echo "Building Docker image ${DOCKER_IMAGE}..."
