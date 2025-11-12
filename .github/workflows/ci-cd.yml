@@ -132,7 +132,12 @@ jobs:
         GITHUB_TOKEN_MANIFESTS: ${{ secrets.MANIFESTS_REPO_TOKEN }}
         APP_NAME: webgoat
       run: bash deploy/update_manifests.sh
-      
+
+    - name: Debug DefectDojo API URL
+      run: |
+        echo "DEFECTDOJO_API = $DEFECTDOJO_API"
+        echo "DEFECTDOJO_TOKEN = ${#DEFECTDOJO_TOKEN} chars (hidden)"
+
     # 7. Push reports to DefectDojo
     - name: Upload scan reports
       env:
@@ -140,6 +145,7 @@ jobs:
         DEFECTDOJO_API: ${{ secrets.DEFECTDOJO_API_URL }}
         DEFECTDOJO_TOKEN: ${{ secrets.DEFECTDOJO_API_TOKEN }}
       run: bash defectdojo/upload_reports.sh
+
 
 
 
