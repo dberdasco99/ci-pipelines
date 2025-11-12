@@ -72,7 +72,10 @@ jobs:
         DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
         DOCKER_IMAGE: dani359/webgoat:${{ github.sha }}
-      run: bash docker/push.sh
+      run: |
+        git clone https://github.com/dberdasco99/webgoat-app app
+        cd app
+        bash ../docker/build.sh
 
 
     # 6. Deploy (update manifests repo)
@@ -83,6 +86,7 @@ jobs:
     - name: Upload reports to DefectDojo
       if: always()
       run: bash defectdojo/upload_reports.sh
+
 
 
 
