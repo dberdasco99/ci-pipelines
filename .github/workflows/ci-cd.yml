@@ -52,8 +52,10 @@ jobs:
     
     - name: Install OWASP Dependency-Check
       run: |
-        wget https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.2/dependency-check-8.4.2-release.zip
-        unzip dependency-check-8.4.2-release.zip -d dependency-check
+        sudo apt-get update
+        sudo apt-get install -y unzip
+        curl -L -o dependency-check.zip https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.2/dependency-check-8.4.2-release.zip
+        unzip dependency-check.zip -d dependency-check
         sudo ln -s $(pwd)/dependency-check/bin/dependency-check.sh /usr/local/bin/dependency-check.sh
 
     # 2. Preflight (Secret scanning, SAST, SCA)
@@ -124,6 +126,7 @@ jobs:
         DEFECTDOJO_API: ${{ secrets.DEFECTDOJO_API_URL }}
         DEFECTDOJO_TOKEN: ${{ secrets.DEFECTDOJO_API_TOKEN }}
       run: bash defectdojo/upload_reports.sh
+
 
 
 
