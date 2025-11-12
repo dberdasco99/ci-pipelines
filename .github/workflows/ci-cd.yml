@@ -47,8 +47,12 @@ jobs:
         bash preflight/run_dependency_check.sh
 
     # 3. Docker Build
-    - name: Build and tag Docker image
-      run: bash docker/build.sh
+    - name: Build application
+      run: |
+        cd app
+        echo "Building application..."
+        mvn -B -DskipTests clean package
+
 
     # 4. Image Scanning (Trivy)
     - name: Scan Docker image
@@ -66,6 +70,7 @@ jobs:
     - name: Upload reports to DefectDojo
       if: always()
       run: bash defectdojo/upload_reports.sh
+
 
 
 
