@@ -49,7 +49,14 @@ jobs:
         tar -xvf gitleaks.tar.gz
         chmod +x gitleaks
         sudo mv gitleaks /usr/local/bin/
-    
+
+    - name: Install Semgrep
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-venv python3-pip
+        python3 -m pip install --upgrade pip
+        pip install semgrep
+
     - name: Install OWASP Dependency-Check
       run: |
         sudo apt-get update
@@ -126,6 +133,7 @@ jobs:
         DEFECTDOJO_API: ${{ secrets.DEFECTDOJO_API_URL }}
         DEFECTDOJO_TOKEN: ${{ secrets.DEFECTDOJO_API_TOKEN }}
       run: bash defectdojo/upload_reports.sh
+
 
 
 
