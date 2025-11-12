@@ -1,7 +1,10 @@
 #!/bin/bash
 set -e
-echo "uilding application..."
+echo "Building application..."
 mvn -B -DskipTests clean package
 
 echo "Building Docker image ${DOCKER_IMAGE}..."
 docker build -t $DOCKER_IMAGE .
+
+echo " Image built successfully:"
+docker images | grep webgoat || echo "No webgoat image found!"
