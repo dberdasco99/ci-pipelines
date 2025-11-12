@@ -1,7 +1,0 @@
-name: Test Shared Runner
-on: [push]
-jobs:
-  test-runner:
-    runs-on: [self-hosted, linux, x64, shared]
-    steps:
-      - run: echo "Runner shared funcionando"
