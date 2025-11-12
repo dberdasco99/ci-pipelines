@@ -50,13 +50,6 @@ jobs:
         chmod +x gitleaks
         sudo mv gitleaks /usr/local/bin/
 
-    - name: Install Semgrep
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y python3-venv python3-pip
-        python3 -m pip install --upgrade pip
-        pip install semgrep
-
     - name: Install OWASP Dependency-Check
       run: |
         sudo apt-get update
@@ -73,12 +66,17 @@ jobs:
       env:
         APP_NAME: webgoat  # o juiceshop
     
-    - name: Preflight / Semgrep
+    - name: Install and run Semgrep
       run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-venv python3-pip
+        python3 -m venv .venv
+        source .venv/bin/activate
+        pip install --upgrade pip
+        pip install semgrep
         mkdir -p reports
-        bash preflight/run_semgrep.sh
-      env:
-        APP_NAME: webgoat
+        semgrep --config auto --json --output reports/${APP_NAME}-semgrep.json || true
+
     
     - name: Preflight / Dependency-Check
       run: |
@@ -133,6 +131,7 @@ jobs:
         DEFECTDOJO_API: ${{ secrets.DEFECTDOJO_API_URL }}
         DEFECTDOJO_TOKEN: ${{ secrets.DEFECTDOJO_API_TOKEN }}
       run: bash defectdojo/upload_reports.sh
+
 
 
 
