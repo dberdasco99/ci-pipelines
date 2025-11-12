@@ -87,9 +87,13 @@ jobs:
       run: bash deploy/update_manifests.sh
       
     # 7. Push reports to DefectDojo
-    - name: Upload reports to DefectDojo
-      if: always()
+    - name: Upload scan reports
+      env:
+        APP_NAME: webgoat
+        DEFECTDOJO_API: ${{ secrets.DEFECTDOJO_API_URL }}
+        DEFECTDOJO_TOKEN: ${{ secrets.DEFECTDOJO_API_TOKEN }}
       run: bash defectdojo/upload_reports.sh
+
 
 
 
