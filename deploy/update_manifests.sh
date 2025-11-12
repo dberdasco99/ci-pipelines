@@ -1,13 +1,16 @@
 #!/bin/bash
 set -e
 
-# Comprueba que la variable DOCKER_IMAGE esté definida
+# Comprobamos variables necesarias
 if [ -z "$DOCKER_IMAGE" ]; then
-  echo "❌ Error: la variable DOCKER_IMAGE no está definida"
+  echo "❌ Error: DOCKER_IMAGE no definido"
+  exit 1
+fi
+if [ -z "$GITHUB_TOKEN_MANIFESTS" ]; then
+  echo "❌ Error: GITHUB_TOKEN_MANIFESTS no definido"
   exit 1
 fi
 
-# Nombre de la aplicación (opcional, por defecto 'webgoat')
 APP_NAME=${APP_NAME:-webgoat}
 
 echo "Updating deployment manifests for $APP_NAME with image ${DOCKER_IMAGE}..."
@@ -15,30 +18,31 @@ echo "Updating deployment manifests for $APP_NAME with image ${DOCKER_IMAGE}..."
 # Limpiamos cualquier clone previo
 rm -rf infra-manifests
 
-# Clonamos el repo público de infra-manifests
-git clone https://github.com/dberdasco99/infra-manifests infra-manifests
+# Clonamos usando token para poder hacer push
+git clone https://${GITHUB_TOKEN_MANIFESTS}@github.com/dberdasco99/infra-manifests infra-manifests
 
 # Verificamos los archivos clonados (opcional, para debug)
 echo "Contenido del repo infra-manifests:"
 ls -R infra-manifests
 
-# Ruta al manifest de la app
-MANIFEST=infra-manifests/${APP_NAME}/deployment.yaml
+# Ruta relativa al manifest dentro del repo
+MANIFEST=${APP_NAME}/deployment.yaml
 
-# Comprobamos que el archivo existe
-if [ -f "$MANIFEST" ]; then
-    echo "Manifest encontrado: $MANIFEST"
-    
-    # Reemplazamos el tag de la imagen Docker
-    sed -i "s|image: .*|image: ${DOCKER_IMAGE}|g" "$MANIFEST"
+# Comprobamos que existe
+if [ -f "infra-manifests/$MANIFEST" ]; then
+    echo "Manifest encontrado: infra-manifests/$MANIFEST"
 
-    # Commit y push
-    git -C infra-manifests add "$MANIFEST"
-    git -C infra-manifests commit -m "ci: update ${APP_NAME} image to ${DOCKER_IMAGE}" || echo "No changes to commit"
-    git -C infra-manifests push origin main
+    # Reemplazamos tag de la imagen Docker
+    sed -i "s|image: .*|image: ${DOCKER_IMAGE}|g" "infra-manifests/$MANIFEST"
+
+    # Commit y push desde el repo clonado
+    cd infra-manifests
+    git add "$MANIFEST"
+    git commit -m "ci: update ${APP_NAME} image to ${DOCKER_IMAGE}" || echo "No changes to commit"
+    git push origin main
 
     echo "✅ Deployment manifest actualizado correctamente"
 else
-    echo "❌ Manifest no encontrado en $MANIFEST"
+    echo "❌ Manifest no encontrado: infra-manifests/$MANIFEST"
     exit 1
 fi
