@@ -55,9 +55,12 @@ jobs:
         sudo apt-get update -y
         sudo apt-get install -y unzip curl
         curl -L -o dependency-check-8.4.2-release.zip https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.2/dependency-check-8.4.2-release.zip
-        unzip dependency-check-8.4.2-release.zip -d dependency-check
-        echo "$(pwd)/dependency-check/bin" >> $GITHUB_PATH
-        ls dependency-check/bin  # debug
+        unzip dependency-check-8.4.2-release.zip
+        # Detectar automáticamente la ruta bin real (depende del zip)
+        BIN_PATH=$(find . -type d -name "bin" | head -n 1)
+        echo "✅ Bin path detected: $BIN_PATH"
+        echo "$(pwd)/$BIN_PATH" >> $GITHUB_PATH
+        ls "$BIN_PATH"  # debug
 
     # 2. Preflight (Secret scanning, SAST, SCA)
     - name: Preflight / Gitleaks
@@ -137,6 +140,7 @@ jobs:
         DEFECTDOJO_API: ${{ secrets.DEFECTDOJO_API_URL }}
         DEFECTDOJO_TOKEN: ${{ secrets.DEFECTDOJO_API_TOKEN }}
       run: bash defectdojo/upload_reports.sh
+
 
 
 
