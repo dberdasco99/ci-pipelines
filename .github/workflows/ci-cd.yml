@@ -43,6 +43,20 @@ jobs:
         distribution: 'temurin'
         java-version: '25'
 
+    - name: Install Gitleaks
+      run: |
+        curl -sL https://github.com/zricethezav/gitleaks/releases/download/v8.17.0/gitleaks_8.17.0_linux_x86_64.tar.gz | tar xz
+        sudo mv gitleaks /usr/local/bin/
+    
+    - name: Install Semgrep
+      run: |
+        pip install semgrep
+    
+    - name: Install OWASP Dependency-Check
+      run: |
+        wget https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.2/dependency-check-8.4.2-release.zip
+        unzip dependency-check-8.4.2-release.zip -d dependency-check
+        sudo ln -s $(pwd)/dependency-check/bin/dependency-check.sh /usr/local/bin/dependency-check.sh
 
     # 2. Preflight (Secret scanning, SAST, SCA)
     - name: Run Preflight scans
@@ -64,6 +78,10 @@ jobs:
 
 
     # 4. Image Scanning (Trivy)
+    - name: Install Trivy
+      run: |
+        curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+        
     - name: Scan Docker image
       env:
         DOCKER_IMAGE: dani359/webgoat:${{ github.sha }}
@@ -93,6 +111,7 @@ jobs:
         DEFECTDOJO_API: ${{ secrets.DEFECTDOJO_API_URL }}
         DEFECTDOJO_TOKEN: ${{ secrets.DEFECTDOJO_API_TOKEN }}
       run: bash defectdojo/upload_reports.sh
+
 
 
 
