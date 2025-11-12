@@ -50,13 +50,6 @@ jobs:
         chmod +x gitleaks
         sudo mv gitleaks /usr/local/bin/
     
-    - name: Install Semgrep
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y python3 python3-pip
-        python3 -m pip install --upgrade pip
-        pip3 install semgrep
-    
     - name: Install OWASP Dependency-Check
       run: |
         wget https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.2/dependency-check-8.4.2-release.zip
@@ -64,12 +57,27 @@ jobs:
         sudo ln -s $(pwd)/dependency-check/bin/dependency-check.sh /usr/local/bin/dependency-check.sh
 
     # 2. Preflight (Secret scanning, SAST, SCA)
-    - name: Run Preflight scans
+    - name: Preflight / Gitleaks
       run: |
         mkdir -p reports
         bash preflight/run_gitleaks.sh
+      env:
+        APP_NAME: webgoat  # o juiceshop
+    
+    - name: Preflight / Semgrep
+      run: |
+        mkdir -p reports
         bash preflight/run_semgrep.sh
+      env:
+        APP_NAME: webgoat
+    
+    - name: Preflight / Dependency-Check
+      run: |
+        mkdir -p reports
         bash preflight/run_dependency_check.sh
+      env:
+        APP_NAME: webgoat
+
 
     # 3. Docker Build
     - name: Build Docker image
@@ -116,6 +124,7 @@ jobs:
         DEFECTDOJO_API: ${{ secrets.DEFECTDOJO_API_URL }}
         DEFECTDOJO_TOKEN: ${{ secrets.DEFECTDOJO_API_TOKEN }}
       run: bash defectdojo/upload_reports.sh
+
 
 
 
