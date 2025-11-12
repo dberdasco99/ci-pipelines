@@ -27,8 +27,8 @@ jobs:
     # Instalar dependencias maven
     - name: Install dependencies
       run: |
-        apt-get update
-        apt-get install -y maven
+        sudo apt-get update
+        sudo apt-get install -y maven
       shell: bash
 
 
@@ -60,6 +60,7 @@ jobs:
     - name: Upload reports to DefectDojo
       if: always()
       run: bash defectdojo/upload_reports.sh
+
 
 
 
