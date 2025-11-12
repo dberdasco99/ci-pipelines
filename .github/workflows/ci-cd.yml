@@ -62,6 +62,8 @@ jobs:
 
     # 4. Image Scanning (Trivy)
     - name: Scan Docker image
+      env:
+        DOCKER_IMAGE: dani359/webgoat:${{ github.sha }}
       run: bash docker/scan_image.sh
 
     # 5. Push Docker image
@@ -81,6 +83,7 @@ jobs:
     - name: Upload reports to DefectDojo
       if: always()
       run: bash defectdojo/upload_reports.sh
+
 
 
 
