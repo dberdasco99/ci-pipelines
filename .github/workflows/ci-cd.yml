@@ -45,7 +45,9 @@ jobs:
 
     - name: Install Gitleaks
       run: |
-        curl -sL https://github.com/zricethezav/gitleaks/releases/download/v8.17.0/gitleaks_8.17.0_linux_x86_64.tar.gz | tar xz
+        curl -L https://github.com/zricethezav/gitleaks/releases/download/v8.17.0/gitleaks_8.17.0_linux_x64.tar.gz -o gitleaks.tar.gz
+        tar -xvf gitleaks.tar.gz
+        chmod +x gitleaks
         sudo mv gitleaks /usr/local/bin/
     
     - name: Install Semgrep
@@ -111,6 +113,7 @@ jobs:
         DEFECTDOJO_API: ${{ secrets.DEFECTDOJO_API_URL }}
         DEFECTDOJO_TOKEN: ${{ secrets.DEFECTDOJO_API_TOKEN }}
       run: bash defectdojo/upload_reports.sh
+
 
 
 
