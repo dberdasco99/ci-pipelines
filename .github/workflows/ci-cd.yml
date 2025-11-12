@@ -24,6 +24,13 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+    # Instalar dependencias maven
+    - name: Install dependencies
+      run: |
+        apt-get update
+        apt-get install -y maven
+      shell: bash
+
 
     # 2. Preflight (Secret scanning, SAST, SCA)
     - name: Run Preflight scans
@@ -53,6 +60,7 @@ jobs:
     - name: Upload reports to DefectDojo
       if: always()
       run: bash defectdojo/upload_reports.sh
+
 
 
 
