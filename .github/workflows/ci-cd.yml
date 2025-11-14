@@ -80,7 +80,8 @@ jobs:
         pip install semgrep
         mkdir -p reports
         semgrep --config auto --json --output reports/${APP_NAME}-semgrep.json || true
-
+      env:
+        APP_NAME: webgoat
     
     - name: Preflight / Dependency-Check
       run: |
@@ -88,6 +89,11 @@ jobs:
         bash preflight/run_dependency_check.sh
       env:
         APP_NAME: webgoat
+        
+# Verificar que hay informes
+    - name: List generated reports
+      run: ls -lh reports/
+
 
 
     # 3. Docker Build
@@ -145,6 +151,7 @@ jobs:
         DEFECTDOJO_API: ${{ secrets.DEFECTDOJO_API_URL }}
         DEFECTDOJO_TOKEN: ${{ secrets.DEFECTDOJO_API_TOKEN }}
       run: bash defectdojo/upload_reports.sh
+
 
 
 
